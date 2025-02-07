@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Media Player</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="media-player">
+        <div class="player-header">
+            <button class="menu-btn">☰</button>
+            <div class="player-icons">
+                <button>🔍</button>
+                <button>🔔</button>
+                <button>👤</button>
+            </div>
+        </div>
+
+        <div class="player-controls">
+            <button class="prev-btn">⏪</button>
+            <button class="play-btn">▶️</button>
+            <button class="next-btn">⏩</button>
+        </div>
+
+        <div class="player-progress">
+            <div class="track-info">
+                <span id="artist-name">Artist Name</span> - <span id="song-name">Song Name</span>
+            </div>
+            <div class="progress-bar">
+                <span id="current-time">0:00</span>
+                <input type="range" id="progress-slider" value="0" max="100">
+                <span id="duration">3:15</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

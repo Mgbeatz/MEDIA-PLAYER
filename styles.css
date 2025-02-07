@@ -1,0 +1,264 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.media-player {
+    background-color: #121212;
+    color: #fff;
+    width: 400px;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.menu-btn, .player-icons button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.player-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.control-btn img {
+    width: 40px;
+    height: 40px;
+}
+
+.player-progress {
+    width: 100%;
+}
+
+.track-info {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #bbb;
+}
+
+.progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#progress-slider {
+    flex: 1;
+    margin: 0 10px;
+    appearance: none;
+    background-color: #444;
+    height: 4px;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+#progress-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: #f00;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+/* Playlist styling */
+.playlist-container {
+    display: none; /* Hidden by default */
+    background-color: #222;
+    color: #fff;
+    position: absolute;
+    top: 200px; /* Adjust position based on your layout */
+    left: 100px;
+    width: 280px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.playlist-container h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.playlist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.playlist li {
+    padding: 10px;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+}
+
+.playlist li:hover {
+    background-color: #333;
+}
+
+/* Style for showing the playlist */
+.playlist-container.show {
+    display: block;
+}
+
+
+
+
+
+
+
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    width: 30%;
+}
+
+.volume-control label {
+    color: #fff;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+#volume-slider {
+    width: 80%;
+    appearance: none;
+    background: #444;
+    height: 4px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+#volume-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    background: rgb(0, 119, 255);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+
+
+
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s ease; /* Smooth shrinking effect */
+}
+
+.icon-btn:active {
+    transform: scale(0.9); /* Make the button shrink slightly */
+}
+
+
+
+
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s ease; /* Smooth shrinking effect */
+}
+
+.icon-btn:active {
+    transform: scale(0.9); /* Make the button shrink slightly */
+}
+
+.profile-container {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: -100px; /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+#profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+
+
+
+
+.image-container {
+    display: none; /* Hidden by default */
+    background-color: #222;
+    color: #fff;
+    position: absolute;
+    top: 200px; /* Adjust position based on your layout */
+    right: 0; /* Position on the right side */
+    width: 280px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    text-align: center;
+}
+
+#media-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* Make sure the playlist doesn't overlap with the new image container */
+.playlist-container {
+    left: 100px; /* Adjust this if needed */
+}
+
+.image-container.show {
+    display: block;
+}
