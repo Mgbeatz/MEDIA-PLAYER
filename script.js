@@ -56,7 +56,7 @@ playlistItems.forEach((track, index) => {
 playBtn.addEventListener('click', () => {
     if (audioPlayer.paused) {
         audioPlayer.play();
-        playIcon.src = "imag/BUTTON-P.png"; // Update to pause icon
+        playIcon.src = "imag/BUTTON-D.png"; // Update to pause icon
     } else {
         audioPlayer.pause();
         playIcon.src = "imag/BUTTON-D.png"; // Update to play icon
