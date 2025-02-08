@@ -66,6 +66,9 @@ function formatTime(seconds) {
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
+
+
+
 // Update track display and play the selected file
 function updateTrackDisplay(index) {
     const currentTrack = playlistItems[index];
@@ -75,11 +78,21 @@ function updateTrackDisplay(index) {
 
     artistNameEl.textContent = artist;
     songNameEl.textContent = song;
-
     audioPlayer.src = src;
-    audioPlayer.play();
+
+    audioPlayer.play().catch(error => {
+        console.error("Auto-play blocked: User interaction needed", error);
+    });
+
     playIcon.src = "imag/BUTTON-P.png"; // Update play icon to pause
 }
+
+
+
+
+
+
+
 
 // Toggle playlist visibility
 menuBtn.addEventListener('click', () => {
