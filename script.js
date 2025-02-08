@@ -255,13 +255,5 @@ faceBtn.addEventListener('click', () => {
 });
 
 
-
-// Toggle playlist visibility
-menuBtn.addEventListener('click', () => {
-    playlistContainer.classList.toggle('show');
-    imageContainer.classList.toggle('show'); // Toggle the image container as well
-});     
-
-
 // Initialize with the first track
 updateTrackDisplay(currentTrackIndex);
