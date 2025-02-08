@@ -14,18 +14,37 @@ const currentTimeEl = document.getElementById('current-time');
 const durationEl = document.getElementById('duration');
 const imageContainer = document.getElementById('image-container');
 
-const repeatBtn = document.getElementById('repeat-btn');
-const shuffleBtn = document.getElementById('shuffle-btn');
-const mediaPlayer = document.querySelector('.media-player');
+
+
+
+
+
+
+
 
 let currentTrackIndex = 0;
-let isRepeatOn = false;
-let isShuffleOn = false;
 
 
 
 
-// Keep screen on when playing
+// Ensure fullscreen on mobile DEMO
+document.addEventListener("DOMContentLoaded", () => {
+    function adjustPlayerSize() {
+        if (window.innerWidth <= 768) {
+            mediaPlayer.style.width = "100vw";
+            mediaPlayer.style.height = "100vh";
+        } else {
+            mediaPlayer.style.width = "auto";
+            mediaPlayer.style.height = "auto";
+        }
+    }
+    adjustPlayerSize();
+    window.addEventListener("resize", adjustPlayerSize);
+});
+
+
+
+// Keep screen on when playing DEMO
 if ('wakeLock' in navigator) {
     let wakeLock = null;
     async function requestWakeLock() {
@@ -45,20 +64,8 @@ if ('wakeLock' in navigator) {
     });
 }
 
-// Format time in MM:SS
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
-}
 
 
-
-
-// WakeLock
-if (!('wakeLock' in navigator)) {
-    console.warn("Wake Lock API is not supported on this browser.");
-}
 
 
 
@@ -73,6 +80,15 @@ function formatTime(seconds) {
 
 
 
+
+
+
+// Center playlist in media player
+playlistContainer.style.position = "absolute";
+playlistContainer.style.left = "50%";
+playlistContainer.style.transform = "translateX(-50%)";
+playlistContainer.style.top = "50%";
+playlistContainer.style.transform += "translateY(-50%)";
 
 // Update track display and play the selected file
 function updateTrackDisplay(index) {
@@ -83,59 +99,13 @@ function updateTrackDisplay(index) {
 
     artistNameEl.textContent = artist;
     songNameEl.textContent = song;
+
     audioPlayer.src = src;
-
-    audioPlayer.play().catch(error => {
-        console.error("Auto-play blocked: User interaction needed", error);
-    });
-
+    audioPlayer.play();
     playIcon.src = "imag/BUTTON-P.png"; // Update play icon to pause
 }
 
 
-
-
-
-
-
-
-// Toggle playlist visibility
-menuBtn.addEventListener('click', () => {
-    playlistContainer.classList.toggle('show');
-});
-
-// Handle track selection
-playlistItems.forEach((track, index) => {
-    track.addEventListener('click', () => {
-        currentTrackIndex = index;
-        updateTrackDisplay(currentTrackIndex);
-        playlistContainer.classList.remove('show');
-    });
-});
-
-// Play/Pause button functionality
-playBtn.addEventListener('click', () => {
-    if (audioPlayer.paused) {
-        audioPlayer.play();
-        playIcon.src = "imag/BUTTON-P.png"; // Update to pause icon
-    } else {
-        audioPlayer.pause();
-        playIcon.src = "imag/BUTTON-D.png"; // Update to play icon
-    }
-});
-
-// Handle Next button
-nextBtn.addEventListener('click', () => {
-    currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
-    updateTrackDisplay(currentTrackIndex);
-});
-
-// Handle Previous button
-prevBtn.addEventListener('click', () => {
-    currentTrackIndex =
-        (currentTrackIndex - 1 + playlistItems.length) % playlistItems.length;
-    updateTrackDisplay(currentTrackIndex);
-});
 
 
 
@@ -171,6 +141,64 @@ audioPlayer.addEventListener('ended', () => {
 
 
 
+
+// Update track display and play the selected file
+function updateTrackDisplay(index) {
+    const currentTrack = playlistItems[index];
+    const artist = currentTrack.dataset.artist;
+    const song = currentTrack.dataset.song;
+    const src = currentTrack.dataset.src;
+
+    artistNameEl.textContent = artist;
+    songNameEl.textContent = song;
+
+    audioPlayer.src = src;
+    audioPlayer.play();
+    playIcon.src = "imag/BUTTON-P.png"; // Update play icon to pause
+}
+
+
+// Toggle playlist visibility
+menuBtn.addEventListener('click', () => {
+    playlistContainer.classList.toggle('show');
+});
+
+
+
+
+// Handle track selection
+playlistItems.forEach((track, index) => {
+    track.addEventListener('click', () => {
+        currentTrackIndex = index;
+        updateTrackDisplay(currentTrackIndex);
+        playlistContainer.classList.remove('show');
+    });
+});
+
+// Play/Pause button functionality
+playBtn.addEventListener('click', () => {
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+        playIcon.src = "imag/BUTTON-P.png"; // Update to pause icon
+    } else {
+        audioPlayer.pause();
+        playIcon.src = "imag/BUTTON-D.png"; // Update to play icon
+    }
+});
+
+// Handle Next button
+nextBtn.addEventListener('click', () => {
+    currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
+    updateTrackDisplay(currentTrackIndex);
+});
+
+// Handle Previous button
+prevBtn.addEventListener('click', () => {
+    currentTrackIndex =
+        (currentTrackIndex - 1 + playlistItems.length) % playlistItems.length;
+    updateTrackDisplay(currentTrackIndex);
+});
+
 // Volume control
 volumeSlider.addEventListener('input', () => {
     audioPlayer.volume = volumeSlider.value;
@@ -187,7 +215,8 @@ progressSlider.addEventListener('input', () => {
     audioPlayer.currentTime = (progressSlider.value / 100) * audioPlayer.duration;
 });
 
-
+// Initialize with the first track
+updateTrackDisplay(currentTrackIndex);
 
 
 
@@ -237,14 +266,15 @@ nextBtn.addEventListener('click', () => {
 
 
 
+
+let isRepeatOn = false;
+let isShuffleOn = false;
 let isProfileVisible = false;
+
+const repeatBtn = document.getElementById('repeat-btn');
+const shuffleBtn = document.getElementById('shuffle-btn');
 const faceBtn = document.querySelector('.player-icons button'); // The button with the face icon
 const profileContainer = document.getElementById('profile-container');
-
-
-
-
-
 
 // Toggle repeat mode
 repeatBtn.addEventListener('click', () => {
@@ -267,5 +297,12 @@ faceBtn.addEventListener('click', () => {
 });
 
 
-// Initialize with the first track
-updateTrackDisplay(currentTrackIndex);
+
+
+
+
+// Toggle playlist visibility
+menuBtn.addEventListener('click', () => {
+    playlistContainer.classList.toggle('show');
+    imageContainer.classList.toggle('show'); // Toggle the image container as well
+});
