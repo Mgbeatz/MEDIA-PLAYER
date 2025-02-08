@@ -13,16 +13,26 @@ const progressSlider = document.getElementById('progress-slider');
 const currentTimeEl = document.getElementById('current-time');
 const durationEl = document.getElementById('duration');
 const imageContainer = document.getElementById('image-container');
+const repeatBtn = document.getElementById('repeat-btn');
+const shuffleBtn = document.getElementById('shuffle-btn');
+const profileContainer = document.getElementById('profile-container');
+const canvas = document.getElementById("audio-visualizer");
 
-
-
-
-
-
-
-
-
+let isRepeatOn = false;
+let isShuffleOn = false;
+let isProfileVisible = false;
 let currentTrackIndex = 0;
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -69,8 +79,6 @@ if ('wakeLock' in navigator) {
 
 
 
-
-
 // Format time in MM:SS
 function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60);
@@ -90,6 +98,9 @@ playlistContainer.style.transform = "translateX(-50%)";
 playlistContainer.style.top = "50%";
 playlistContainer.style.transform += "translateY(-50%)";
 
+
+
+
 // Update track display and play the selected file
 function updateTrackDisplay(index) {
     const currentTrack = playlistItems[index];
@@ -104,41 +115,6 @@ function updateTrackDisplay(index) {
     audioPlayer.play();
     playIcon.src = "imag/BUTTON-P.png"; // Update play icon to pause
 }
-
-
-
-
-
-
-
-// Play next track automatically or loop to first track
-function playNextTrack() {
-    if (isShuffleOn) {
-        let randomIndex;
-        do {
-            randomIndex = Math.floor(Math.random() * playlistItems.length);
-        } while (randomIndex === currentTrackIndex);
-        currentTrackIndex = randomIndex;
-    } else {
-        currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
-    }
-    updateTrackDisplay(currentTrackIndex);
-}
-
-// Auto play next track when the current one ends
-audioPlayer.addEventListener('ended', () => {
-    if (isRepeatOn) {
-        audioPlayer.currentTime = 0;
-        audioPlayer.play();
-    } else {
-        playNextTrack();
-    }
-});
-
-
-
-
-
 
 
 
@@ -186,6 +162,44 @@ playBtn.addEventListener('click', () => {
     }
 });
 
+
+// Play next track automatically or loop to first track
+function playNextTrack() {
+    if (isShuffleOn) {
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * playlistItems.length);
+        } while (randomIndex === currentTrackIndex);
+        currentTrackIndex = randomIndex;
+    } else {
+        currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
+    }
+    updateTrackDisplay(currentTrackIndex);
+}
+
+// Auto play next track when the current one ends
+audioPlayer.addEventListener('ended', () => {
+    if (isRepeatOn) {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+    } else {
+        playNextTrack();
+    }
+});
+
+
+// Progress bar and timing
+audioPlayer.addEventListener('timeupdate', () => {
+    progressSlider.value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
+    currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+    durationEl.textContent = formatTime(audioPlayer.duration || 0);
+});
+
+progressSlider.addEventListener('input', () => {
+    audioPlayer.currentTime = (progressSlider.value / 100) * audioPlayer.duration;
+});
+
+
 // Handle Next button
 nextBtn.addEventListener('click', () => {
     currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
@@ -199,30 +213,33 @@ prevBtn.addEventListener('click', () => {
     updateTrackDisplay(currentTrackIndex);
 });
 
+
+
 // Volume control
 volumeSlider.addEventListener('input', () => {
     audioPlayer.volume = volumeSlider.value;
 });
 
-// Progress bar and timing
-audioPlayer.addEventListener('timeupdate', () => {
-    progressSlider.value = (audioPlayer.currentTime / audioPlayer.duration) * 100 || 0;
-    currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
-    durationEl.textContent = formatTime(audioPlayer.duration || 0);
+
+// Load saved volume from localStorage (if exists)
+const savedVolume = localStorage.getItem('audioVolume');
+if (savedVolume !== null) {
+    audioPlayer.volume = savedVolume;  // Set the volume
+    volumeSlider.value = savedVolume;  // Update slider position
+}
+
+// Volume control and saving to localStorage
+volumeSlider.addEventListener('input', () => {
+    const volume = volumeSlider.value;
+    audioPlayer.volume = volume;
+    localStorage.setItem('audioVolume', volume); // Save volume
 });
 
-progressSlider.addEventListener('input', () => {
-    audioPlayer.currentTime = (progressSlider.value / 100) * audioPlayer.duration;
-});
+
+
 
 // Initialize with the first track
 updateTrackDisplay(currentTrackIndex);
-
-
-
-
-
-
 
 
 
@@ -267,14 +284,6 @@ nextBtn.addEventListener('click', () => {
 
 
 
-let isRepeatOn = false;
-let isShuffleOn = false;
-let isProfileVisible = false;
-
-const repeatBtn = document.getElementById('repeat-btn');
-const shuffleBtn = document.getElementById('shuffle-btn');
-const faceBtn = document.querySelector('.player-icons button'); // The button with the face icon
-const profileContainer = document.getElementById('profile-container');
 
 // Toggle repeat mode
 repeatBtn.addEventListener('click', () => {
@@ -301,8 +310,75 @@ faceBtn.addEventListener('click', () => {
 
 
 
-// Toggle playlist visibility
+// Toggle playlist visibility when the menu button is clicked
 menuBtn.addEventListener('click', () => {
     playlistContainer.classList.toggle('show');
-    imageContainer.classList.toggle('show'); // Toggle the image container as well
+    imageContainer.classList.toggle('show');
+});
+
+// Close playlist if clicked outside of the playlist or the image container
+document.addEventListener('click', (event) => {
+    // Check if the click is outside the playlist container and image container
+    if (!playlistContainer.contains(event.target) && !imageContainer.contains(event.target) && !menuBtn.contains(event.target)) {
+        playlistContainer.classList.remove('show');
+        imageContainer.classList.remove('show');
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Set canvas size
+canvas.width = window.innerWidth;
+canvas.height = 150; // Adjust height as needed
+
+// Function to draw track image
+function drawTrackImage(imageSrc) {
+    const img = new Image();
+    img.src = imageSrc;
+
+    img.onload = () => {
+        // Clear canvas before drawing
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw image centered
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        canvasCtx.drawImage(img, 0, 0, imgWidth, imgHeight);
+    };
+}
+
+// Update track display (Show track image)
+function updateTrackDisplay(index) {
+    const currentTrack = playlistItems[index];
+    const artist = currentTrack.dataset.artist;
+    const song = currentTrack.dataset.song;
+    const src = currentTrack.dataset.src;
+    const imageSrc = currentTrack.dataset.image; // Add 'data-image' in your HTML
+
+    artistNameEl.textContent = artist;
+    songNameEl.textContent = song;
+
+    audioPlayer.src = src;
+    audioPlayer.play();
+    playIcon.src = "imag/BUTTON-P.png"; // Update play icon to pause
+
+    // Show track image
+    drawTrackImage(imageSrc);
+}
+
+// Resize canvas on window resize
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = 150;
 });
