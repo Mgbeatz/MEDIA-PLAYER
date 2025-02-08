@@ -168,5 +168,13 @@ shuffleBtn.addEventListener('click', () => {
     shuffleBtn.style.color = isShuffleOn ? 'rgb(0, 119, 255)' : '#fff';
 });
 
+
+
+// Toggle playlist visibility
+menuBtn.addEventListener('click', () => {
+    playlistContainer.classList.toggle('show');
+    imageContainer.classList.toggle('show'); // Toggle the image container as well
+});
+
 // Initialize with the first track
 updateTrackDisplay(currentTrackIndex);
