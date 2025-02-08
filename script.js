@@ -14,7 +14,50 @@ const currentTimeEl = document.getElementById('current-time');
 const durationEl = document.getElementById('duration');
 const imageContainer = document.getElementById('image-container');
 
+const repeatBtn = document.getElementById('repeat-btn');
+const shuffleBtn = document.getElementById('shuffle-btn');
+const mediaPlayer = document.querySelector('.media-player');
+
 let currentTrackIndex = 0;
+let isRepeatOn = false;
+let isShuffleOn = false;
+
+
+
+
+// Keep screen on when playing
+if ('wakeLock' in navigator) {
+    let wakeLock = null;
+    async function requestWakeLock() {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+        } catch (err) {
+            console.error(`Wake Lock error: ${err.message}`);
+        }
+    }
+    audioPlayer.addEventListener('play', requestWakeLock);
+    audioPlayer.addEventListener('pause', () => {
+        if (wakeLock !== null) {
+            wakeLock.release().then(() => {
+                wakeLock = null;
+            });
+        }
+    });
+}
+
+// Format time in MM:SS
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+
+
+
+
+
+
 
 // Format time in MM:SS
 function formatTime(seconds) {
@@ -75,6 +118,40 @@ prevBtn.addEventListener('click', () => {
         (currentTrackIndex - 1 + playlistItems.length) % playlistItems.length;
     updateTrackDisplay(currentTrackIndex);
 });
+
+
+
+
+
+// Play next track automatically or loop to first track
+function playNextTrack() {
+    if (isShuffleOn) {
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * playlistItems.length);
+        } while (randomIndex === currentTrackIndex);
+        currentTrackIndex = randomIndex;
+    } else {
+        currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
+    }
+    updateTrackDisplay(currentTrackIndex);
+}
+
+// Auto play next track when the current one ends
+audioPlayer.addEventListener('ended', () => {
+    if (isRepeatOn) {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+    } else {
+        playNextTrack();
+    }
+});
+
+
+
+
+
+
 
 // Volume control
 volumeSlider.addEventListener('input', () => {
@@ -153,6 +230,11 @@ const shuffleBtn = document.getElementById('shuffle-btn');
 const faceBtn = document.querySelector('.player-icons button'); // The button with the face icon
 const profileContainer = document.getElementById('profile-container');
 
+
+
+
+
+
 // Toggle repeat mode
 repeatBtn.addEventListener('click', () => {
     isRepeatOn = !isRepeatOn;
@@ -172,9 +254,6 @@ faceBtn.addEventListener('click', () => {
     isProfileVisible = !isProfileVisible;
     profileContainer.style.display = isProfileVisible ? 'block' : 'none';
 });
-
-
-
 
 
 
