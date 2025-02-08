@@ -237,13 +237,7 @@ nextBtn.addEventListener('click', () => {
 
 
 
-
-let isRepeatOn = false;
-let isShuffleOn = false;
 let isProfileVisible = false;
-
-const repeatBtn = document.getElementById('repeat-btn');
-const shuffleBtn = document.getElementById('shuffle-btn');
 const faceBtn = document.querySelector('.player-icons button'); // The button with the face icon
 const profileContainer = document.getElementById('profile-container');
 
