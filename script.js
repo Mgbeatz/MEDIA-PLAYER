@@ -14,7 +14,36 @@ const currentTimeEl = document.getElementById('current-time');
 const durationEl = document.getElementById('duration');
 const imageContainer = document.getElementById('image-container');
 
+const repeatBtn = document.getElementById('repeat-btn');
+const shuffleBtn = document.getElementById('shuffle-btn');
+const mediaPlayer = document.querySelector('.media-player');
+
 let currentTrackIndex = 0;
+let isRepeatOn = false;
+let isShuffleOn = false;
+
+
+
+
+// Keep screen on when playing
+if ('wakeLock' in navigator) {
+    let wakeLock = null;
+    async function requestWakeLock() {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+        } catch (err) {
+            console.error(`Wake Lock error: ${err.message}`);
+        }
+    }
+    audioPlayer.addEventListener('play', requestWakeLock);
+    audioPlayer.addEventListener('pause', () => {
+        if (wakeLock !== null) {
+            wakeLock.release().then(() => {
+                wakeLock = null;
+            });
+        }
+    });
+}
 
 // Format time in MM:SS
 function formatTime(seconds) {
@@ -22,6 +51,28 @@ function formatTime(seconds) {
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
+
+
+
+
+// WakeLock
+if (!('wakeLock' in navigator)) {
+    console.warn("Wake Lock API is not supported on this browser.");
+}
+
+
+
+
+
+// Format time in MM:SS
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+
+
 
 // Update track display and play the selected file
 function updateTrackDisplay(index) {
@@ -32,11 +83,21 @@ function updateTrackDisplay(index) {
 
     artistNameEl.textContent = artist;
     songNameEl.textContent = song;
-
     audioPlayer.src = src;
-    audioPlayer.play();
+
+    audioPlayer.play().catch(error => {
+        console.error("Auto-play blocked: User interaction needed", error);
+    });
+
     playIcon.src = "imag/BUTTON-P.png"; // Update play icon to pause
 }
+
+
+
+
+
+
+
 
 // Toggle playlist visibility
 menuBtn.addEventListener('click', () => {
@@ -76,6 +137,40 @@ prevBtn.addEventListener('click', () => {
     updateTrackDisplay(currentTrackIndex);
 });
 
+
+
+
+
+// Play next track automatically or loop to first track
+function playNextTrack() {
+    if (isShuffleOn) {
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * playlistItems.length);
+        } while (randomIndex === currentTrackIndex);
+        currentTrackIndex = randomIndex;
+    } else {
+        currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
+    }
+    updateTrackDisplay(currentTrackIndex);
+}
+
+// Auto play next track when the current one ends
+audioPlayer.addEventListener('ended', () => {
+    if (isRepeatOn) {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+    } else {
+        playNextTrack();
+    }
+});
+
+
+
+
+
+
+
 // Volume control
 volumeSlider.addEventListener('input', () => {
     audioPlayer.volume = volumeSlider.value;
@@ -92,8 +187,7 @@ progressSlider.addEventListener('input', () => {
     audioPlayer.currentTime = (progressSlider.value / 100) * audioPlayer.duration;
 });
 
-// Initialize with the first track
-updateTrackDisplay(currentTrackIndex);
+
 
 
 
@@ -153,6 +247,11 @@ const shuffleBtn = document.getElementById('shuffle-btn');
 const faceBtn = document.querySelector('.player-icons button'); // The button with the face icon
 const profileContainer = document.getElementById('profile-container');
 
+
+
+
+
+
 // Toggle repeat mode
 repeatBtn.addEventListener('click', () => {
     isRepeatOn = !isRepeatOn;
@@ -174,12 +273,5 @@ faceBtn.addEventListener('click', () => {
 });
 
 
-
-
-
-
-// Toggle playlist visibility
-menuBtn.addEventListener('click', () => {
-    playlistContainer.classList.toggle('show');
-    imageContainer.classList.toggle('show'); // Toggle the image container as well
-});
+// Initialize with the first track
+updateTrackDisplay(currentTrackIndex);
