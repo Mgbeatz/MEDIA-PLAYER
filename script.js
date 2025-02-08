@@ -13,8 +13,12 @@ const progressSlider = document.getElementById('progress-slider');
 const currentTimeEl = document.getElementById('current-time');
 const durationEl = document.getElementById('duration');
 const imageContainer = document.getElementById('image-container');
+const repeatBtn = document.getElementById('repeat-btn');
+const shuffleBtn = document.getElementById('shuffle-btn');
 
 let currentTrackIndex = 0;
+let isRepeatOn = false;
+let isShuffleOn = false;
 
 // Format time in MM:SS
 function formatTime(seconds) {
@@ -38,11 +42,6 @@ function updateTrackDisplay(index) {
     playIcon.src = "imag/BUTTON-P.png"; // Update play icon to pause
 }
 
-// Toggle playlist visibility
-menuBtn.addEventListener('click', () => {
-    playlistContainer.classList.toggle('show');
-});
-
 // Handle track selection
 playlistItems.forEach((track, index) => {
     track.addEventListener('click', () => {
@@ -56,24 +55,46 @@ playlistItems.forEach((track, index) => {
 playBtn.addEventListener('click', () => {
     if (audioPlayer.paused) {
         audioPlayer.play();
-        playIcon.src = "imag/BUTTON-P.png"; // Update to pause icon
+        playIcon.src = "imag/BUTTON-P.png";
     } else {
         audioPlayer.pause();
-        playIcon.src = "imag/BUTTON-D.png"; // Update to play icon
+        playIcon.src = "imag/BUTTON-D.png";
     }
 });
 
 // Handle Next button
 nextBtn.addEventListener('click', () => {
-    currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
-    updateTrackDisplay(currentTrackIndex);
+    playNextTrack();
 });
 
 // Handle Previous button
 prevBtn.addEventListener('click', () => {
-    currentTrackIndex =
-        (currentTrackIndex - 1 + playlistItems.length) % playlistItems.length;
+    currentTrackIndex = (currentTrackIndex - 1 + playlistItems.length) % playlistItems.length;
     updateTrackDisplay(currentTrackIndex);
+});
+
+// Play next track automatically or loop to first track
+function playNextTrack() {
+    if (isShuffleOn) {
+        let randomIndex;
+        do {
+            randomIndex = Math.floor(Math.random() * playlistItems.length);
+        } while (randomIndex === currentTrackIndex);
+        currentTrackIndex = randomIndex;
+    } else {
+        currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
+    }
+    updateTrackDisplay(currentTrackIndex);
+}
+
+// Auto play next track when the current one ends
+audioPlayer.addEventListener('ended', () => {
+    if (isRepeatOn) {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+    } else {
+        playNextTrack();
+    }
 });
 
 // Volume control
@@ -92,94 +113,17 @@ progressSlider.addEventListener('input', () => {
     audioPlayer.currentTime = (progressSlider.value / 100) * audioPlayer.duration;
 });
 
-// Initialize with the first track
-updateTrackDisplay(currentTrackIndex);
-
-
-
-
-
-
-
-
-
-
-
 // Toggle repeat mode
 repeatBtn.addEventListener('click', () => {
     isRepeatOn = !isRepeatOn;
-    repeatBtn.style.color = isRepeatOn ? 'rgb(0, 119, 255)' : '#fff'; // Highlight when active
-});
-
-// Restart track when it ends if repeat is on
-audioPlayer.addEventListener('ended', () => {
-    if (isRepeatOn) {
-        audioPlayer.currentTime = 0;
-        audioPlayer.play();
-    } else {
-        nextBtn.click(); // Move to the next track
-    }
-});
-
-
-
-
-
-// Override the next button behavior if shuffle is on
-nextBtn.addEventListener('click', () => {
-    if (isShuffleOn) {
-        let randomIndex;
-        do {
-            randomIndex = Math.floor(Math.random() * playlistItems.length);
-        } while (randomIndex === currentTrackIndex);
-
-        currentTrackIndex = randomIndex;
-    } else {
-        currentTrackIndex = (currentTrackIndex + 1) % playlistItems.length;
-    }
-    updateTrackDisplay(currentTrackIndex);
-});
-
-
-
-
-
-let isRepeatOn = false;
-let isShuffleOn = false;
-let isProfileVisible = false;
-
-const repeatBtn = document.getElementById('repeat-btn');
-const shuffleBtn = document.getElementById('shuffle-btn');
-const faceBtn = document.querySelector('.player-icons button'); // The button with the face icon
-const profileContainer = document.getElementById('profile-container');
-
-// Toggle repeat mode
-repeatBtn.addEventListener('click', () => {
-    isRepeatOn = !isRepeatOn;
-    repeatBtn.style.transform = isRepeatOn ? 'scale(0.9)' : 'scale(1)'; // Shrink when pressed
-    repeatBtn.style.color = isRepeatOn ? 'rgb(0, 119, 255)' : '#fff'; // Highlight when active
+    repeatBtn.style.color = isRepeatOn ? 'rgb(0, 119, 255)' : '#fff';
 });
 
 // Toggle shuffle mode
 shuffleBtn.addEventListener('click', () => {
     isShuffleOn = !isShuffleOn;
-    shuffleBtn.style.transform = isShuffleOn ? 'scale(0.9)' : 'scale(1)'; // Shrink when pressed
-    shuffleBtn.style.color = isShuffleOn ? 'rgb(0, 119, 255)' : '#fff'; // Highlight when active
+    shuffleBtn.style.color = isShuffleOn ? 'rgb(0, 119, 255)' : '#fff';
 });
 
-// Toggle profile visibility
-faceBtn.addEventListener('click', () => {
-    isProfileVisible = !isProfileVisible;
-    profileContainer.style.display = isProfileVisible ? 'block' : 'none';
-});
-
-
-
-
-
-
-// Toggle playlist visibility
-menuBtn.addEventListener('click', () => {
-    playlistContainer.classList.toggle('show');
-    imageContainer.classList.toggle('show'); // Toggle the image container as well
-});
+// Initialize with the first track
+updateTrackDisplay(currentTrackIndex);
