@@ -55,6 +55,11 @@ function formatTime(seconds) {
 
 
 
+// WakeLock
+if (!('wakeLock' in navigator)) {
+    console.warn("Wake Lock API is not supported on this browser.");
+}
+
 
 
 
