@@ -15,6 +15,8 @@ const durationEl = document.getElementById('duration');
 const imageContainer = document.getElementById('image-container');
 let currentTrackIndex = 0;
 
+const repeatBtn = document.getElementById('repeat-btn');
+const shuffleBtn = document.getElementById('shuffle-btn');
 
 
 
@@ -277,13 +279,7 @@ nextBtn.addEventListener('click', () => {
 
 
 let isRepeatOn = false;
-let isShuffleOn = false;
-let isProfileVisible = false;
 
-const repeatBtn = document.getElementById('repeat-btn');
-const shuffleBtn = document.getElementById('shuffle-btn');
-const faceBtn = document.querySelector('.player-icons button'); // The button with the face icon
-const profileContainer = document.getElementById('profile-container');
 
 // Toggle repeat mode
 repeatBtn.addEventListener('click', () => {
