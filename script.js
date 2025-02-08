@@ -169,8 +169,7 @@ progressSlider.addEventListener('input', () => {
     audioPlayer.currentTime = (progressSlider.value / 100) * audioPlayer.duration;
 });
 
-// Initialize with the first track
-updateTrackDisplay(currentTrackIndex);
+
 
 
 
@@ -262,3 +261,7 @@ menuBtn.addEventListener('click', () => {
     playlistContainer.classList.toggle('show');
     imageContainer.classList.toggle('show'); // Toggle the image container as well
 });     
+
+
+// Initialize with the first track
+updateTrackDisplay(currentTrackIndex);
