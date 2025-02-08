@@ -15,10 +15,46 @@ const durationEl = document.getElementById('duration');
 const imageContainer = document.getElementById('image-container');
 const repeatBtn = document.getElementById('repeat-btn');
 const shuffleBtn = document.getElementById('shuffle-btn');
+const mediaPlayer = document.querySelector('.media-player');
 
 let currentTrackIndex = 0;
 let isRepeatOn = false;
 let isShuffleOn = false;
+
+// Ensure fullscreen on mobile
+document.addEventListener("DOMContentLoaded", () => {
+    function adjustPlayerSize() {
+        if (window.innerWidth <= 768) {
+            mediaPlayer.style.width = "100vw";
+            mediaPlayer.style.height = "100vh";
+        } else {
+            mediaPlayer.style.width = "auto";
+            mediaPlayer.style.height = "auto";
+        }
+    }
+    adjustPlayerSize();
+    window.addEventListener("resize", adjustPlayerSize);
+});
+
+// Keep screen on when playing
+if ('wakeLock' in navigator) {
+    let wakeLock = null;
+    async function requestWakeLock() {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+        } catch (err) {
+            console.error(`Wake Lock error: ${err.message}`);
+        }
+    }
+    audioPlayer.addEventListener('play', requestWakeLock);
+    audioPlayer.addEventListener('pause', () => {
+        if (wakeLock !== null) {
+            wakeLock.release().then(() => {
+                wakeLock = null;
+            });
+        }
+    });
+}
 
 // Format time in MM:SS
 function formatTime(seconds) {
@@ -26,6 +62,13 @@ function formatTime(seconds) {
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
+
+// Center playlist in media player
+playlistContainer.style.position = "absolute";
+playlistContainer.style.left = "50%";
+playlistContainer.style.transform = "translateX(-50%)";
+playlistContainer.style.top = "50%";
+playlistContainer.style.transform += "translateY(-50%)";
 
 // Update track display and play the selected file
 function updateTrackDisplay(index) {
