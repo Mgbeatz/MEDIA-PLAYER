@@ -24,6 +24,20 @@ const shuffleBtn = document.getElementById('shuffle-btn');
 
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    const audioPlayer = document.getElementById("audioPlayer");
+    const playCountDisplay = document.getElementById("playCount");
+    let playCount = localStorage.getItem("playCount") || 0;
+    playCountDisplay.textContent = playCount;
+
+    audioPlayer.addEventListener("play", function () {
+        if (audioPlayer.currentTime === 0) {
+            playCount++;
+            localStorage.setItem("playCount", playCount);
+            playCountDisplay.textContent = playCount;
+        }
+    });
+});
 
 
 
